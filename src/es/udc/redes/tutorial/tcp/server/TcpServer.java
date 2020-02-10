@@ -13,32 +13,52 @@ public class TcpServer {
             System.err.println("Format: TcpServer <port>");
             System.exit(-1);
         }
-        try {
-            // Create a server socket
-            
-            // Set a timeout of 300 secs
-            
-            while (true) {
-                // Wait for connections
-                
-                // Set the input channel
-                
-                // Set the output channel
-                
-                // Receive the client message
-                
-                // Send response to the client
-
-                // Close the streams
+        try{
+            ServerSocket servidor = new ServerSocket(Integer.parseInt(argv[0]));
+            while (true){
+                (new ServerThread(servidor.accept())).start();
             }
-        // Uncomment next catch clause after implementing the logic            
-        //} catch (SocketTimeoutException e) {
-        //    System.err.println("Nothing received in 300 secs ");
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+        }
+        catch (IOException e){
             e.printStackTrace();
-        } finally {
-//Close the socket
+        }
+    }
+}
+
+class ServerThread extends Thread {
+    ServerThread(Socket socket){
+        this.socket = socket;
+    }
+    private Socket socket = null;
+    @Override
+    public void run(){
+        try{
+            //Set input channel
+            BufferedReader input = new BufferedReader(
+                new InputStreamReader(
+                    socket.getInputStream()));
+            //Set output channet
+            PrintWriter output = new PrintWriter(socket.getOutputStream(),true);
+            //Read message
+            String entrante = input.readLine();
+            //Send response
+            String saliente = "This is the TCP Server. You said :" + entrante;
+            output.print(saliente);
+            output.flush();
+            //Close streams
+            input.close();
+            output.close();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            try{
+                socket.close();
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
         }
     }
 }
