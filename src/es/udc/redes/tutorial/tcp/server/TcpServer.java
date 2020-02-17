@@ -4,7 +4,7 @@ import java.net.*;
 import java.io.*;
 
 /**
- * Monothread TCP echo server.
+ * Multithread TCP echo server.
  */
 public class TcpServer {
 
@@ -41,6 +41,7 @@ class ServerThread extends Thread {
             PrintWriter output = new PrintWriter(socket.getOutputStream(),true);
             //Read message
             String entrante = input.readLine();
+            System.out.println("Received message: " + entrante);
             //Send response
             String saliente = "This is the TCP Server. You said :" + entrante;
             output.print(saliente);
