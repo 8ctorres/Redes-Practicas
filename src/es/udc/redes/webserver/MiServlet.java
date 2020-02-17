@@ -1,5 +1,5 @@
+package es.udc.redes.webserver;
 import java.util.Map;
-
 
 public class MiServlet implements MiniServlet {
 	
