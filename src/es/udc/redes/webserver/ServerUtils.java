@@ -2,7 +2,6 @@ package es.udc.redes.webserver;
 import java.util.Map;
 
 public class ServerUtils {
-
 	public static String processDynRequest(String nombreclase,
 			Map<String, String> parameters) throws Exception {
 
@@ -13,6 +12,5 @@ public class ServerUtils {
 		servlet = (MiniServlet) instancia.newInstance();
 
 		return servlet.doGet(parameters);
-
 	}
 }
