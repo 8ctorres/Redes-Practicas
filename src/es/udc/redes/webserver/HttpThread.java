@@ -31,19 +31,26 @@ public class HttpThread extends Thread{
                             socket.getInputStream()));
             //Set output channel
             output = new PrintWriter(socket.getOutputStream());
+            //reads line by line then builds a string with the
+            //request that will be passed to the handler class
+            String line;
+            StringBuilder rq_builder = new StringBuilder(); 
             //Read incoming request
-            String request = input.readLine();
-            //Prints the request in command line (only for development purposes)
-            System.out.println("Received request:");
-            System.out.println(request);
-            
-            
+            do {
+                line = input.readLine();
+                rq_builder.append(line);
+            } while (!"".equals(line));
+            String request = new String(rq_builder);
+            HttpRequest handler = (HttpRequest)
+                    Class.forName(request.split(" ")[0]).newInstance();
+            //The HttpRequest handler responds using the output stream
+            handler.respond(request, output);
             //Close streams
             input.close();
             output.close();
         }
-        catch(IOException e){
-            System.out.println("I/O Exception!!");
+        catch(Exception e){
+            System.out.println("Exception!!");
             e.printStackTrace();
         }
         finally{
