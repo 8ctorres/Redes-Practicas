@@ -44,7 +44,7 @@ public class HttpThread extends Thread{
             HttpRequest handler = (HttpRequest)
                     Class.forName(request.split(" ")[0]).newInstance();
             //The HttpRequest handler responds using the output stream
-            handler.respond(request, output);
+            output.write(handler.respond(request));
             //Close streams
             input.close();
             output.close();

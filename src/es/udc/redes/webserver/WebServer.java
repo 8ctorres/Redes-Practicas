@@ -10,6 +10,10 @@ import java.net.ServerSocket;
  */
 public class WebServer {
     /**
+     * Indicates where the webserver resources are located in the File System
+     */
+    public final String RESOURCES_PATH = "C:\\Users\\carlo\\FIC\\Redes\\resources";
+    /**
      * Main method, the webserver runs this method when it is launched
      * It continuosly listens for new TCP connections and when a socket is
      * estabilished, launches a new thread and passes it as an argument.
