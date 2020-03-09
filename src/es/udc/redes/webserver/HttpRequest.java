@@ -4,12 +4,13 @@
  * and open the template in the editor.
  */
 package es.udc.redes.webserver;
+import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 /**
- * All Http request handlers (HEAD, GET, PUT, POST...) must implement this interface
+ * All Http request handlers (HEAD, GET, PUT, POST...) must inherit from this class
  * @author carlos.torres
  */
 public abstract class HttpRequest {
@@ -18,10 +19,10 @@ public abstract class HttpRequest {
      * using the given output writer
      * @param request = request to handle
      * This method does not close the writer after using it
-     * @return a String containing the HTTP response to the input request
+     * @param output : the writer it uses to send the response
      * @throws es.udc.redes.webserver.HttpException
      */
-    public abstract String respond(String request) throws HttpException;
+    public abstract void respond(String request, PrintWriter output) throws HttpException;
     /**
      * This method takes no arguments and returns the current system date and time
      * in Http v1 format
@@ -41,7 +42,26 @@ public abstract class HttpRequest {
         StringBuilder response = new StringBuilder();
         response.append("HTTP/1.0 400 Bad Request\n");
         response.append(getHttpDate());
+        response.append("\n");
         return response.toString();
     }
-    
+    /**
+     * This method generates a generic HTTP 404 Not Found response
+     * Includes header and Date line
+     * @return a String containing the response
+     */
+    public static String fileNotFound(){
+        StringBuilder response = new StringBuilder();
+        response.append("HTTP/1.0 404 Not Found\n");
+        response.append(getHttpDate());
+        response.append("\n");
+        return response.toString();
+    }
+    /**
+     * 
+     * @return 
+     */
+    public static String getHttpContentType(){
+        return "antonio";
+    }
 }

@@ -5,13 +5,15 @@
  */
 package es.udc.redes.webserver;
 
+import java.io.PrintWriter;
+
 /**
  * The HEAD class implements handling of HTTP HEAD requests
  * @author carlos.torres
  */
 public class HEAD extends HttpRequest {
     @Override
-    public String respond(String request) throws HttpException {
+    public void respond(String request, PrintWriter output) throws HttpException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
