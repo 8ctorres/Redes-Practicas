@@ -41,10 +41,9 @@ public class HttpThread extends Thread{
                 rq_builder.append(line);
             } while (!"".equals(line));
             String request = new String(rq_builder);
-            HttpRequest handler = (HttpRequest)
-                    Class.forName(request.split(" ")[0]).newInstance();
+            HttpRequest handler = new HttpRequest(request);
             //The HttpRequest handler responds using the output stream
-            handler.respond(request, output);
+            handler.respond(output);
             output.flush();
             //Close streams
             input.close();
@@ -59,6 +58,7 @@ public class HttpThread extends Thread{
                 socket.close();
             } catch (IOException ex) {
                 System.out.println("I/O Exception while closing socket!!");
+                ex.printStackTrace();
             }
         }
     }
