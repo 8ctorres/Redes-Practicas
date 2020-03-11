@@ -40,7 +40,7 @@ public class HttpThread extends Thread{
                 line = input.readLine();
                 rq_builder.append(line);
             } while (!"".equals(line));
-            String request = new String(rq_builder);
+            String request = rq_builder.toString();
             HttpRequest handler = new HttpRequest(request);
             //The HttpRequest handler responds using the output stream
             handler.respond(output);

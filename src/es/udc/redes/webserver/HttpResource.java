@@ -66,7 +66,7 @@ public class HttpResource {
         FileReader reader = new FileReader(this.file);
         int c;
         try {
-            while ((c = reader.read()) == -1){
+            while ((c = reader.read()) != -1){
                 output.write(c);
             }
         } catch (IOException ex) {
@@ -83,7 +83,7 @@ public class HttpResource {
         FileInputStream input = new FileInputStream(this.file);
         int c;
         try {
-            while ((c = input.read()) == -1){
+            while ((c = input.read()) != -1){
                 output.write(c);
             }
         } catch (IOException ex){

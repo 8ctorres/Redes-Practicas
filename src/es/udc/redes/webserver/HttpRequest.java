@@ -64,7 +64,7 @@ public class HttpRequest {
         
         resource.writeHead(output); //Status and header lines
         output.println(); //Blank line
-        //if ("GET".equals(rq[0])){ //Head requests don't send body
+        if (rq[0].equals("GET")){ //Head requests don't send body
             try {
                 resource.writeBody(output); //File body
             } catch (FileNotFoundException ex) {
@@ -72,7 +72,7 @@ public class HttpRequest {
                 System.out.println("File not found exception");
                 ex.printStackTrace();
             }
-        //}
+        }
     }
     
     /**
