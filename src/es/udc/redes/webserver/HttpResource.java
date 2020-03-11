@@ -12,6 +12,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
     
 /**
  * HttpResource handlers. All specific handlers (text/html, text/plain...) are HttpResources
@@ -30,10 +34,16 @@ public class HttpResource {
     }
     /**
      * This method sends the head of the http response
+     * If the file was not modified, it returns 304 Not Mofidied status code
      * @param output: the PrintWriter object that will be used to send the output to
+     * @param was_mod: a flag that indicates if the file was modified since last request
      */
-    public void writeHead(PrintWriter output){
-        output.println("HTTP/1.0 200 OK");
+    public void writeHead(PrintWriter output, boolean was_mod){
+        if (was_mod)
+            output.println("HTTP/1.0 200 OK");
+        else
+            output.println("HTTP/1.0 304 Not Modified");
+        
         output.write(HttpRequest.getHttpDate());
         output.println("Server: Práctica de Redes/Carlos Torres");
         output.println("Content-Type: " + content_type);
@@ -43,6 +53,7 @@ public class HttpResource {
             System.out.println("I/O Exception!");
             ex.printStackTrace();
         }
+        output.write(getLastModified());
     }
     /**
      * This method reads from the file and sends it to an output
@@ -124,5 +135,20 @@ public class HttpResource {
             default:
                 return ("application/octet-stream");
         }
+    }
+    /**
+     * This method returns the last modification date of the file
+     * @return a String formatted according to the HTML 1.1 standard
+     */
+    public String getLastModified(){
+        StringBuilder sb = new StringBuilder("Last-Modified: ");
+        sb.append(DateTimeFormatter.RFC_1123_DATE_TIME.format(
+                ZonedDateTime.ofInstant(
+                        Instant.ofEpochMilli(this.file.lastModified())
+                        ,ZoneOffset.UTC
+                )
+            )
+        );
+        return sb.toString();
     }
 }
