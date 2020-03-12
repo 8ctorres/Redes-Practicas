@@ -10,6 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.time.Instant;
@@ -45,7 +47,7 @@ public class HttpResource {
             output.println("HTTP/1.0 304 Not Modified");
         
         output.write(HttpRequest.getHttpDate());
-        output.println("Server: Práctica de Redes/Carlos Torres");
+        output.println("Server: Redes/Carlos Torres");
         output.println("Content-Type: " + content_type);
         try {
             output.println("Content-Length: " + Files.size(file.toPath()));
@@ -56,17 +58,33 @@ public class HttpResource {
         output.write(getLastModified());
     }
     /**
-     * This method reads from the file and sends it to an output
-     * @param output: the PrintWriter object that will be used to send the output to
+     * This method reads from the file and sends it to an output. It flushes the output at the end.
+     * @param output: the OutputStream object that will be used to send the output to
      * @throws java.io.FileNotFoundException if the file does not exist or can't be found
      */
-    public void writeBody(PrintWriter output) throws FileNotFoundException{
+    public void writeBody(OutputStream output) throws FileNotFoundException{
         switch(this.getExtension()){
             case("html"):
             case("txt"):
-                writeText(output); return;
+                writeText(new PrintWriter(output)); return;
             default:
-                writeBinary(output);
+                writeBinary(new PrintStream(output));
+        }
+    }
+    /**
+     * This method reads from the file and sends it to an output. It flushes the output it used when it ends
+     * @param output: the OutputStream object that will be used to send the output to
+     * @param output_writer: a PrintWriter object to send the output to in case the file is a text file
+     * @throws java.io.FileNotFoundException if the file does not exist or can't be found
+     */
+    public void writeBody(OutputStream output, PrintWriter output_writer) throws FileNotFoundException{
+        switch(this.getExtension()){
+            case("html"):
+            case("txt"):
+                //Uses an output_writer that is already opened to prevent problems with output buffers
+                writeText(output_writer); return;
+            default:
+                writeBinary(new PrintStream(output, true));
         }
     }
     /**
@@ -84,13 +102,14 @@ public class HttpResource {
             System.out.println("IO Exception while reading the file");
             ex.printStackTrace();
         }
+        output.flush();
         
     }
     /**
-     * Writes raw data from a file into a PrintWriter
-     * @param output: the PrintWriter to copy the file in
+     * Writes raw data from a file into a PrintStream
+     * @param output: the PrintStream to copy the file in
      */
-    private void writeBinary(PrintWriter output) throws FileNotFoundException{
+    private void writeBinary(PrintStream output) throws FileNotFoundException{
         FileInputStream input = new FileInputStream(this.file);
         int c;
         try {
@@ -101,6 +120,7 @@ public class HttpResource {
             System.out.println("IO Exception while reading the file");
             ex.printStackTrace();
         }
+        output.flush();
     }
     /**
      * Gets extension of a file
@@ -149,6 +169,7 @@ public class HttpResource {
                 )
             )
         );
+        sb.append("\n");
         return sb.toString();
     }
 }

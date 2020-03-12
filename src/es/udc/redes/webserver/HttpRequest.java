@@ -6,6 +6,7 @@
 package es.udc.redes.webserver;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.time.ZoneOffset;
@@ -28,21 +29,24 @@ public class HttpRequest {
      * This method does not close the writer after using it
      * @param output : the writer it uses to send the response
      */
-    public void respond(PrintWriter output){
+    public void respond(OutputStream output){
         //Split request in lines
-        String [] lines = request.split("\n");
+        String [] lines = request.split(System.lineSeparator());
         //First line, request line
         String[] rq = lines[0].split(" ");
         
+        //Builds a PrintWriter object to send characters, with AutoFlush enabled
+        PrintWriter output_writer = new PrintWriter(output, true);
+        
         if (!rq[2].startsWith("HTTP/")){
             //Bad requests handling
-            output.write(badRequest());
+            output_writer.write(badRequest());
             return;
         }
         
         if ((!"GET".equals(rq[0])) && (!"HEAD".equals(rq[0]))){
             System.out.println("rq[0] = " + rq[0]);
-            output.write(badRequest());
+            output_writer.write(badRequest());
             return;
         }
         
@@ -61,7 +65,7 @@ public class HttpRequest {
         
         if (!Files.exists(resource_file.toPath())){
             //Checks that the file exists
-            output.write(fileNotFound());
+            output_writer.write(fileNotFound());
             return;
         }
         
@@ -70,7 +74,7 @@ public class HttpRequest {
         /*Checks for the If-Modified-Since line.
         if there is a date, checks whether the file was or not modified*/
         for (int i = 1; i<lines.length; i++){
-            if (lines[i].startsWith("If-Modified-Since")){
+            if (lines[i].startsWith("If-Modified-Since: ")){
                 was_mod = wasModified(resource_file, lines[i].substring(19));
                 break;
             }
@@ -78,12 +82,15 @@ public class HttpRequest {
         
         HttpResource resource = new HttpResource(resource_file);
         
-        resource.writeHead(output, was_mod); //Status and header lines
-        output.println(); //Blank line
+        resource.writeHead(output_writer, was_mod); //Status and header lines
+        //Output PrintWriter is flushed now to prevent problems when sending the file body
+        output_writer.flush();
+        //Writes blank line
+        output_writer.println();
         //Head requests don't send body. If it was not modified, the body isn't sent either
         if ((rq[0].equals("GET")) || (!was_mod)){
             try {
-                resource.writeBody(output); //File body
+                resource.writeBody(output, output_writer); //File body
             } catch (FileNotFoundException ex) {
                 //Should never happen because its already been checked that the file exists
                 System.out.println("File not found exception");
@@ -143,7 +150,6 @@ public class HttpRequest {
      */
     public boolean wasModified(File file, String since){
         TemporalAccessor sincedt = (DateTimeFormatter.RFC_1123_DATE_TIME).parse(since);
-        
         return false;
     }
 }
