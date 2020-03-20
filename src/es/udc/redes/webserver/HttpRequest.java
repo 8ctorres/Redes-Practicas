@@ -9,9 +9,11 @@ import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 
 /**
@@ -73,11 +75,18 @@ public class HttpRequest {
         
         /*Checks for the If-Modified-Since line.
         if there is a date, checks whether the file was or not modified*/
-        for (int i = 1; i<lines.length; i++){
-            if (lines[i].startsWith("If-Modified-Since: ")){
-                was_mod = wasModified(resource_file, lines[i].substring(19));
-                break;
+        try{
+            for (int i = 1; i<lines.length; i++){
+                if (lines[i].startsWith("If-Modified-Since: ")){
+                    was_mod = wasModified(resource_file, lines[i].substring(19));
+                    break;
+                }
             }
+        }catch(DateTimeParseException ex){
+            //If the If-Modified-Since line is wrong, then send a 400 Bad Request and return
+            System.out.println("If Modified Since line could not be parsed");
+            output_writer.write(badRequest());
+            return;
         }
         
         HttpResource resource = new HttpResource(resource_file);
@@ -148,8 +157,14 @@ public class HttpRequest {
      * @param since: the date formatted in a String
      * @return true if it was modified
      */
-    public boolean wasModified(File file, String since){
-        TemporalAccessor sincedt = (DateTimeFormatter.RFC_1123_DATE_TIME).parse(since);
-        return false;
+    public static boolean wasModified(File file, String since) throws DateTimeParseException {
+        long sincedt = (
+                ZonedDateTime.parse(since,(DateTimeFormatter.RFC_1123_DATE_TIME)).toEpochSecond());
+        /*file.lastModified() returns a long containing the last modified date, expressed in
+          MILLISECONDS since the epoch, so it is divided by 1000 (integer division)
+        */
+        long file_mod = file.lastModified()/1000;
+        //Gives the modification date a millisecond of margin
+        return (sincedt < file_mod);
     }
 }
