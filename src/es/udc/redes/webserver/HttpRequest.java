@@ -74,7 +74,7 @@ public class HttpRequest {
         String resource_name = split_petition[1];
         
         if (resource_name.equals("/")){
-            resource_name = "/index.html"; //Default resource is index.html
+            resource_name = WebServer.PROPERTIES.getProperty("DIRECTORY_INDEX"); //Default resource is index.html
         }
         
         /*Ensures that it works under Windows or any other OS where the path separator
@@ -82,7 +82,8 @@ public class HttpRequest {
         On UNIX systems, the resource_name String remains unchanged
         */
         resource_name = resource_name.replace('/', File.separatorChar);
-        resource_name = WebServer.RESOURCES_PATH + resource_name;
+        //Converts relative to absolute pathname
+        resource_name = WebServer.PROPERTIES.getProperty("DIRECTORY") + resource_name;
         
         //Creates a File object associated to the requested resource
         File resource_file = new File(resource_name);
@@ -119,7 +120,7 @@ public class HttpRequest {
         //Writes blank line
         output_writer.println();
         //Head requests don't send body. If it was not modified, the body isn't sent either
-        if ((split_petition[0].equals("GET")) || (!was_mod)){
+        if ((split_petition[0].equals("GET")) && (was_mod)){
             try {
                 bytes_sent = resource.writeBody(output, output_writer); //File body
             } catch (FileNotFoundException ex) {

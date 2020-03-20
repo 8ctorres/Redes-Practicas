@@ -1,11 +1,13 @@
 package es.udc.redes.webserver;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
+import java.util.Properties;
 
 /**
  * A Webserver listens for new TCP connections, estabilishes a socket and then
@@ -14,18 +16,33 @@ import java.net.ServerSocket;
  */
 public class WebServer {
     /**
-     * Indicates where the webserver resources and logs are located in the File System.
-     * This is only temporary until the configuration file is implemented
+     * Indicates where the webserver properties file is located in the system
      */
-    public static final String RESOURCES_PATH = "C:\\Users\\carlo\\FIC\\Redes\\resources";
-    public static final String LOG_PATH = "C:\\Users\\carlo\\FIC\\Redes\\logs\\webserver.log";
-    public static final String ERROR_LOG_PATH = "C:\\Users\\carlo\\FIC\\Redes\\logs\\error.log";
+    public static final String PROPERTIES_PATH = "C:\\Users\\carlo\\FIC\\Redes\\resources\\server.properties";
+    public static final Properties PROPERTIES = WebServer.loadProperties();
+    /**
+     * This method loads the webserver properties from the file
+     * @return 
+     */
+    public static Properties loadProperties(){
+        Properties prop = new Properties();
+        try {
+            prop.load(new FileInputStream(PROPERTIES_PATH));
+        } catch (FileNotFoundException ex) {
+            System.out.println("Properties file does not exist");
+            return null;
+        } catch (IOException ex) {
+            System.out.println("Properties file can't be opened");
+            return null;
+        }
+        return prop;
+    }
     /**
      * Opens the log file
      * @return a PrintWriter object that can be used to write to the log file
      */
     private static PrintWriter openLog() throws FileNotFoundException, IOException{
-        File log = new File(LOG_PATH);
+        File log = new File(PROPERTIES.getProperty("LOG_FILE"));
         if (!log.isFile()){
             /*The FileNotFoundException exception should never occur because it is checked that
             the file exists BEFORE trying to open a PrintWriter to it*/
@@ -39,7 +56,7 @@ public class WebServer {
      * @return a PrintWriter object that can be used to write to the log file
      */
     private static PrintWriter openErrorLog() throws FileNotFoundException, IOException{
-        File error_log = new File(ERROR_LOG_PATH);
+        File error_log = new File(PROPERTIES.getProperty("ERROR_LOG_FILE"));
         if(!error_log.isFile()){
             error_log.createNewFile();
         }
@@ -52,12 +69,12 @@ public class WebServer {
      * @param argv = arguments given in the command line
      */
     public static void main(String argv[]) {
-        if (argv.length != 1) {
-            System.err.println("Format: TcpServer <port>");
+        if (argv.length != 0) {
+            System.err.println("No arguments required");
             System.exit(-1);
         }
         try{
-            ServerSocket servidor = new ServerSocket(Integer.parseInt(argv[0]));
+            ServerSocket servidor = new ServerSocket(Integer.parseInt(PROPERTIES.getProperty("PORT")));
             while (true){
                 (new HttpThread(servidor.accept(), openLog(), openErrorLog())).start();
             }
