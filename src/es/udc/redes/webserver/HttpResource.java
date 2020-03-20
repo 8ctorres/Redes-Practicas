@@ -20,14 +20,15 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
     
 /**
- * HttpResource handlers. All specific handlers (text/html, text/plain...) are HttpResources
+ * Represents a resource (html text, plain text, images...)
+ * that can possibly be sent as response to an HTTP Request
  * @author carlos.torres
  */
 public class HttpResource {
     private final File file;
     private final String content_type;
     /**
-     * Creates a new HttpResource with the specified file
+     * Creates a new HttpResource associated to the specified file in the system
      * @param file: the file in the system to use as resource
      */
     public HttpResource(File file){
@@ -36,15 +37,21 @@ public class HttpResource {
     }
     /**
      * This method sends the head of the http response
-     * If the file was not modified, it returns 304 Not Mofidied status code
+     * If the file was not modified, it returns a 304 Not Mofidied status code
      * @param output: the PrintWriter object that will be used to send the output to
      * @param was_mod: a flag that indicates if the file was modified since last request
+     * @return the Http status code
      */
-    public void writeHead(PrintWriter output, boolean was_mod){
-        if (was_mod)
+    public int writeHead(PrintWriter output, boolean was_mod){
+        int code;
+        if (was_mod){
             output.println("HTTP/1.0 200 OK");
-        else
+            code = 200;
+        }
+        else{
             output.println("HTTP/1.0 304 Not Modified");
+            code = 304;
+        }
         
         output.write(HttpRequest.getHttpDate());
         output.println("Server: Redes/Carlos Torres");
@@ -52,75 +59,83 @@ public class HttpResource {
         try {
             output.println("Content-Length: " + Files.size(file.toPath()));
         } catch (IOException ex) {
-            System.out.println("I/O Exception!");
-            ex.printStackTrace();
+            System.out.println("I/O Exception when reading from file");
         }
         output.write(getLastModified());
+        return code;
     }
     /**
      * This method reads from the file and sends it to an output. It flushes the output at the end.
+     * It always reads the file byte per byte, independently of it being a text file or other type of file
      * @param output: the OutputStream object that will be used to send the output to
+     * @return the number of bytes read from the file sent
      * @throws java.io.FileNotFoundException if the file does not exist or can't be found
      */
-    public void writeBody(OutputStream output) throws FileNotFoundException{
-        switch(this.getExtension()){
-            case("html"):
-            case("txt"):
-                writeText(new PrintWriter(output)); return;
-            default:
-                writeBinary(new PrintStream(output));
-        }
+    public int writeBody(OutputStream output) throws FileNotFoundException, IOException{
+        return writeBinary(new PrintStream(output,true));
     }
     /**
-     * This method reads from the file and sends it to an output. It flushes the output it used when it ends
+     * This method reads from the file and sends it to an output. It flushes the output it used when it ends.
+     * If the file is a text file, it uses the PrintWriter, and it uses the OutputStream otherwise
      * @param output: the OutputStream object that will be used to send the output to
      * @param output_writer: a PrintWriter object to send the output to in case the file is a text file
+     * @return number of bytes read from the file and sent
      * @throws java.io.FileNotFoundException if the file does not exist or can't be found
      */
-    public void writeBody(OutputStream output, PrintWriter output_writer) throws FileNotFoundException{
+    public int writeBody(OutputStream output, PrintWriter output_writer) throws FileNotFoundException{
         switch(this.getExtension()){
             case("html"):
             case("txt"):
                 //Uses an output_writer that is already opened to prevent problems with output buffers
-                writeText(output_writer); return;
+                return writeText(output_writer);
             default:
-                writeBinary(new PrintStream(output, true));
+                return writeBinary(new PrintStream(output, true));
         }
     }
     /**
      * Writes text files into a PrintWriter
-     * @param output: the PrintWriter to copy the file in
+     * @param output - the PrintWriter to send the file into
+     * @return - the number of BYTES (not characters) read from the file
+     * @throws FileNotFoundException 
      */
-    private void writeText(PrintWriter output) throws FileNotFoundException{
+    private int writeText(PrintWriter output) throws FileNotFoundException{
         FileReader reader = new FileReader(this.file);
         int c;
+        int counter = 0;
         try {
             while ((c = reader.read()) != -1){
+                if (c>0xff)
+                    counter+=2;
+                else
+                    counter++;
                 output.write(c);
             }
         } catch (IOException ex) {
             System.out.println("IO Exception while reading the file");
-            ex.printStackTrace();
         }
         output.flush();
-        
+        return counter;
     }
     /**
      * Writes raw data from a file into a PrintStream
-     * @param output: the PrintStream to copy the file in
+     * @param output - The PrintStream to copy the file in
+     * @return the number of bytes read and sent
+     * @throws FileNotFoundException 
      */
-    private void writeBinary(PrintStream output) throws FileNotFoundException{
+    private int writeBinary(PrintStream output) throws FileNotFoundException{
         FileInputStream input = new FileInputStream(this.file);
         int c;
+        int counter = 0;
         try {
             while ((c = input.read()) != -1){
+                counter++;
                 output.write(c);
             }
         } catch (IOException ex){
             System.out.println("IO Exception while reading the file");
-            ex.printStackTrace();
         }
         output.flush();
+        return counter;
     }
     /**
      * Gets extension of a file
