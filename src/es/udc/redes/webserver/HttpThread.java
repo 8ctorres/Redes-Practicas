@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An HTTP Thread, given an existing, open socket, listens for an HTTP Request,
@@ -35,7 +37,7 @@ public class HttpThread extends Thread{
     }
     @Override
     public void run(){
-        try{
+        try {
             //Set input channel
             input = new BufferedReader(
                     new InputStreamReader(
@@ -62,17 +64,14 @@ public class HttpThread extends Thread{
             //Close streams
             input.close();
             output.close();
-        }
-        catch(IOException e){
-            System.out.println("IO Exception while closing output streams!!");
-            e.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(HttpThread.class.getName()).log(Level.SEVERE, null, ex);
         }
         finally{
             try {
                 socket.close();
             } catch (IOException ex) {
-                System.out.println("I/O Exception while closing socket!!");
-                ex.printStackTrace();
+                Logger.getLogger(HttpThread.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

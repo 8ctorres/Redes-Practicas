@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A Webserver listens for new TCP connections, estabilishes a socket and then
@@ -18,7 +20,7 @@ public class WebServer {
     /**
      * Indicates where the webserver properties file is located in the system
      */
-    public static final String PROPERTIES_PATH = "C:\\Users\\carlo\\FIC\\Redes\\resources\\server.properties";
+    public static final String PROPERTIES_PATH = "C:\\Users\\carlo\\FIC\\Redes\\src\\server.properties";
     public static final Properties PROPERTIES = WebServer.loadProperties();
     /**
      * This method loads the webserver properties from the file
@@ -30,9 +32,11 @@ public class WebServer {
             prop.load(new FileInputStream(PROPERTIES_PATH));
         } catch (FileNotFoundException ex) {
             System.out.println("Properties file does not exist");
+            Logger.getLogger(WebServer.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         } catch (IOException ex) {
             System.out.println("Properties file can't be opened");
+            Logger.getLogger(WebServer.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
         return prop;
@@ -78,9 +82,8 @@ public class WebServer {
             while (true){
                 (new HttpThread(servidor.accept(), openLog(), openErrorLog())).start();
             }
-        }
-        catch (IOException e){
-            e.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(WebServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }    
 }

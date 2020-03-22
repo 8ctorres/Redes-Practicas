@@ -18,6 +18,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
     
 /**
  * Represents a resource (html text, plain text, images...)
@@ -59,7 +61,7 @@ public class HttpResource {
         try {
             output.println("Content-Length: " + Files.size(file.toPath()));
         } catch (IOException ex) {
-            System.out.println("I/O Exception when reading from file");
+            Logger.getLogger(HttpResource.class.getName()).log(Level.SEVERE, null, ex);
         }
         output.write(getLastModified());
         return code;
@@ -110,12 +112,13 @@ public class HttpResource {
                     counter++;
                 output.write(c);
             }
-        } catch (IOException ex) {
-            System.out.println("IO Exception while reading the file");
+        }
+        catch (IOException ex) {
+            Logger.getLogger(HttpResource.class.getName()).log(Level.SEVERE, null, ex);
         }
         output.flush();
         return counter;
-    }
+    }   
     /**
      * Writes raw data from a file into a PrintStream
      * @param output - The PrintStream to copy the file in
@@ -132,7 +135,7 @@ public class HttpResource {
                 output.write(c);
             }
         } catch (IOException ex){
-            System.out.println("IO Exception while reading the file");
+            Logger.getLogger(HttpResource.class.getName()).log(Level.SEVERE, null, ex);
         }
         output.flush();
         return counter;

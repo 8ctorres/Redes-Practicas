@@ -10,10 +10,14 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An Http request object represents an HTTP v1.0 Request, given as a multi-line String
@@ -22,6 +26,7 @@ import java.time.format.DateTimeParseException;
 public class HttpRequest {
     private final String request;
     private final String client_ip;
+    private String hostname;
     /*Stores some of the response details,
     so they can be accessed later by log() and errorLog() methods*/
     private String petition_line;
@@ -42,7 +47,7 @@ public class HttpRequest {
     /**
      * Interprets the HTTP request and sends the appropiate response
      * using the given output stream
-     * This method does not close the writer after using it
+     * This method does not close the output stream after using it
      * @param output : the outputstream it uses to send the response
      * @return status code of the response
      */
@@ -53,6 +58,14 @@ public class HttpRequest {
         this.petition_line = lines[0];
         //Splits petition line in words
         String[] split_petition = lines[0].split(" ");
+        
+        //Reads hostname, used for redirection links
+        for (int i = 1; i<lines.length; i++){
+                if (lines[i].startsWith("Host: ")){
+                    this.hostname = lines[i].substring(6);
+                    break;
+                }
+            }
         
         //Builds a PrintWriter object to send characters, with AutoFlush enabled
         PrintWriter output_writer = new PrintWriter(output, true);
@@ -74,7 +87,26 @@ public class HttpRequest {
         String resource_name = split_petition[1];
         
         if (resource_name.equals("/")){
-            resource_name = WebServer.PROPERTIES.getProperty("DIRECTORY_INDEX"); //Default resource is index.html
+            String directory = WebServer.PROPERTIES.getProperty("DIRECTORY");
+            resource_name = WebServer.PROPERTIES.getProperty("DIRECTORY_INDEX"); //Default in that directory
+            if (!Files.exists(Paths.get(directory + resource_name))){
+                //If the default file for the directory does not exist
+                //The action depends on the ALLOW directive
+                if (Boolean.getBoolean(WebServer.PROPERTIES.getProperty("ALLOW"))){
+                    //ALLOW directive enabled
+                    this.status_code = 404;
+                    String[] dir_page = generateDirectoryPage(new File(WebServer.PROPERTIES.getProperty("DIRECTORY")));
+                    output_writer.write(fileNotFound());
+                    output_writer.println();
+                    for (String line : dir_page)
+                        output_writer.println(line);
+                    return status_code;
+                }else{
+                    //ALLOW directive disabled
+                    output_writer.write(accessForbidden());
+                    return status_code;
+                }
+            }
         }
         
         /*Ensures that it works under Windows or any other OS where the path separator
@@ -126,14 +158,43 @@ public class HttpRequest {
             } catch (FileNotFoundException ex) {
                 //Should never happen because its already been checked that the file exists
                 System.out.println("File not found exception");
+                Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return status_code;
     }
     /**
+     * Dynamically generate an HTML Document that links every item in the specified directory,
+     * and returns it in an array of Strings, line by line.
+     * @param dir - a FILE object containing the directory to list
+     * @return - The HTML page represented as an array of Strings, with each element being a line of the file
+     */
+    public String[] generateDirectoryPage(File dir){
+        if(dir.isDirectory()){
+            ArrayList<String> page = new ArrayList(50);
+            page.add("<!DOCTYPE html>");
+            page.add("<html>");
+            page.add("<head>");
+            page.add("<title>Directory index</title>");
+            page.add("</head>");
+            page.add("");
+            page.add("<h1>Listing of the directory</h1>");
+            page.add("<ul>");
+            String[] dir_list = dir.list();
+            for (String item : dir_list) {
+                page.add("<il href=\"" + "http://" + hostname + "/" + item + "\">" + item + "</il>");
+            }
+            page.add("</ul>");
+            return page.toArray(new String[0]);
+        }else{
+            //The specified directory is not a directory
+            return null;
+        }
+    }
+    /**
      * Writes information about the request and response in a log file. If the request
      * caused an error, writes it in the same file
-     * @param log_writer - a PrintWriter objecto to write to the log file
+     * @param log_writer - a PrintWriter object to write to the log file
      */
     public void log(PrintWriter log_writer){
         log(log_writer,log_writer);
@@ -174,6 +235,9 @@ public class HttpRequest {
             case(400):
                 sb.append("400 Bad Request");
                 break;
+            case(403):
+                sb.append("403 Access Forbidden");
+                break;
             case(404):
                 sb.append("404 Not Found");
                 break;
@@ -205,6 +269,20 @@ public class HttpRequest {
         response.append(getHttpDate());
         response.append(System.lineSeparator());
         this.status_code = 400;
+        return response.toString();
+    }
+    /**
+     * This method generates a generic HTTP 403 Access Forbidden response
+     * Includes header and Date line
+     * @return a String containing the response
+     */
+    public String accessForbidden() {
+        StringBuilder response = new StringBuilder();
+        response.append("HTTP/1.0 403 Access Forbidden");
+        response.append(System.lineSeparator());
+        response.append(getHttpDate());
+        response.append(System.lineSeparator());
+        this.status_code = 403;
         return response.toString();
     }
     
