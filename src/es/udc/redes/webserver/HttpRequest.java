@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,13 +24,15 @@ import java.util.logging.Logger;
  */
 public class HttpRequest {
     private final String request;
-    private final String client_ip;
+    private String[] request_lines;
     private String hostname;
+    private PrintWriter output_writer;
+    private File resource_file;
     /*Stores some of the response details,
     so they can be accessed later by log() and errorLog() methods*/
-    private String petition_line;
     private final String date_time;
-    private int status_code = 500;
+    private final String client_ip;
+    private int status_code = 100;
     private int bytes_sent = 0;
     /**
      * Creates a new HTTPRequest object, from a given request,
@@ -52,105 +53,64 @@ public class HttpRequest {
      * @return status code of the response
      */
     public int respond(OutputStream output){
-        //Split request in lines
-        String [] lines = request.split(System.lineSeparator());
-        //Stores petition line
-        this.petition_line = lines[0];
-        //Splits petition line in words
-        String[] split_petition = lines[0].split(" ");
-        
-        //Reads hostname, used for redirection links
-        for (int i = 1; i<lines.length; i++){
-                if (lines[i].startsWith("Host: ")){
-                    this.hostname = lines[i].substring(6);
-                    break;
-                }
-            }
         
         //Builds a PrintWriter object to send characters, with AutoFlush enabled
-        PrintWriter output_writer = new PrintWriter(output, true);
+        this.output_writer = new PrintWriter(output, true);
         
-        if (!split_petition[2].startsWith("HTTP/")){
-            //Bad requests handling
+        //Split request in lines
+        this.request_lines = this.request.split(System.lineSeparator());
+        
+        //Reads the host name from the request
+        this.hostname = readHostname();
+        
+        //Gets the requested resource name
+        String resource_name = getResourceName();
+        
+        //If the resource name wasn't parsed, it means that the request is not correct
+        if(resource_name == null){
             output_writer.write(badRequest());
+            output_writer.println();
             return status_code;
         }
         
-        if ((!"GET".equals(split_petition[0])) && (!"HEAD".equals(split_petition[0]))){
-            //If the method is not GET or HEAD, send 400 badRequest
-            System.out.println("split_petition[0] = " + split_petition[0]);
-            output_writer.write(badRequest());
-            return status_code;
-        }
+        //Builds a file that points to the resource in the system
+        this.resource_file = openFile(resource_name);
         
-        //Gets the wanted resource name
-        String resource_name = split_petition[1];
+        status_code = handleDirectories();
         
-        if (resource_name.equals("/")){
-            String directory = WebServer.PROPERTIES.getProperty("DIRECTORY");
-            resource_name = WebServer.PROPERTIES.getProperty("DIRECTORY_INDEX"); //Default in that directory
-            if (!Files.exists(Paths.get(directory + resource_name))){
-                //If the default file for the directory does not exist
-                //The action depends on the ALLOW directive
-                if (Boolean.getBoolean(WebServer.PROPERTIES.getProperty("ALLOW"))){
-                    //ALLOW directive enabled
-                    this.status_code = 404;
-                    String[] dir_page = generateDirectoryPage(new File(WebServer.PROPERTIES.getProperty("DIRECTORY")));
-                    output_writer.write(fileNotFound());
-                    output_writer.println();
-                    for (String line : dir_page)
-                        output_writer.println(line);
-                    return status_code;
-                }else{
-                    //ALLOW directive disabled
-                    output_writer.write(accessForbidden());
-                    return status_code;
-                }
-            }
-        }
+        if (status_code != 100)
+            return status_code; 
         
-        /*Ensures that it works under Windows or any other OS where the path separator
-        is the backwards slash "\" instead of the forward "/"
-        On UNIX systems, the resource_name String remains unchanged
-        */
-        resource_name = resource_name.replace('/', File.separatorChar);
-        //Converts relative to absolute pathname
-        resource_name = WebServer.PROPERTIES.getProperty("DIRECTORY") + resource_name;
-        
-        //Creates a File object associated to the requested resource
-        File resource_file = new File(resource_name);
-        
-        if (!Files.exists(resource_file.toPath())){
+        if (!resource_file.exists()){
             //Checks that the file exists
             //If the requested resource does not exist, respond 404 Not Found
             output_writer.write(fileNotFound());
+            output_writer.println();
             return status_code;
         }
         
-        boolean was_mod = true;        
-        /*Checks for the If-Modified-Since line.
-        if the field exists, checks whether the file was or not modified*/
         try{
-            for (int i = 1; i<lines.length; i++){
-                if (lines[i].startsWith("If-Modified-Since: ")){
-                    was_mod = wasModified(resource_file, lines[i].substring(19));
-                    break;
-                }
-            }
-        }catch(DateTimeParseException ex){
+            status_code = checkIfModified();
+        }
+        catch (DateTimeParseException ex){
             //If the If-Modified-Since line is wrong, then send a 400 Bad Request and return
             System.out.println("If Modified Since line could not be parsed");
             output_writer.write(badRequest());
+            output_writer.println();
             return status_code;
         }
         
         HttpResource resource = new HttpResource(resource_file);
         
-        status_code = resource.writeHead(output_writer, was_mod); //Status and header lines
+        resource.writeHead(output_writer, (status_code != 304)); //Status and header lines
         //Output PrintWriter is flushed now to prevent problems when sending the file body
         output_writer.flush();
         //Writes blank line
         output_writer.println();
+        
+        //TODO implementar método sendBody() ou equivalente, tendo en conta o tipo de petición
+        //e si o ficheiro foi modificado
+        
         //Head requests don't send body. If it was not modified, the body isn't sent either
         if ((split_petition[0].equals("GET")) && (was_mod)){
             try {
@@ -163,34 +123,181 @@ public class HttpRequest {
         }
         return status_code;
     }
+    
+    /**
+     * Reads the Host line from the request, and returns the specified hostname
+     * @return a String containing only the hostname.
+     */
+    private String readHostname(){
+        //Reads hostname, used for redirection links
+        for (int i = 1; i<request_lines.length; i++){
+                if (request_lines[i].startsWith("Host: ")){
+                    return request_lines[i].substring(6, request_lines[i].length()-1);
+                }
+        }
+        return null;
+    }
+    
+    /**
+     * Gets the requested resource name from the request. This method also
+     * validates if the petition line is a valid HTTP 1.0 Request. If there is an error,
+     * uses the object's output_writer to send an adequate error response.
+     * @return - a String containing the resource name, or null if there is an error
+     * in the request (in which case, the object's status_code will be changed)
+     */
+    private String getResourceName(){
+        String petition_line = request_lines[0];
+        String[] petition_words = petition_line.split(" ");
+        try{
+            if (!petition_words[2].startsWith("HTTP/")){
+                //Bad request
+                return null;
+            }
+        }
+        catch(ArrayIndexOutOfBoundsException ex){
+            //Bad request
+            return null;
+        }
+        
+        //TODO
+        //Move this section to each specific class
+        if ((!"GET".equals(petition_words[0])) && (!"HEAD".equals(petition_words[0]))){
+            //If the method is not GET or HEAD, send 400 badRequest
+            System.out.println("split_petition[0] = " + petition_words[0]);
+            //Bad request
+            return null;
+        }
+        //If the client asked for the index (GET /), this returns the empty string
+        return petition_words[1].substring(1);
+    }
+    
+    /**
+     * Opens the file in the system that corresponds to the request resource
+     * @param resource_name - a String containing the resource name
+     * @return a File pointer
+     */
+    private File openFile(String resource_name){
+        //Reads resources path from properties file
+        String directory = WebServer.PROPERTIES.getProperty("DIRECTORY");
+        try {
+            return new File(directory, resource_name);
+        }catch (NullPointerException ex){
+            return new File(directory, "");
+        }
+    }
+    
+    /**
+     * Checks if the specified resource is a directory. If it's not, returns a 100 (Continue)
+     * status code. If it is, applies ALLOW directive and sends the adequate response through the
+     * object's output_writer
+     * @return 100 if it's not a directory, the pertinent status code if it is
+     */
+    private int handleDirectories(){
+        //Handling if it asks for a directory
+        if (resource_file.isDirectory()){
+            //If it is a directory
+            //Gets default directory index
+            String default_res_name = WebServer.PROPERTIES.getProperty("DIRECTORY_INDEX"); //Default index in directory
+            File default_resource = new File(resource_file, default_res_name);
+            //Checks if the default resource for the directory exists
+            if (default_resource.exists()){
+                //If the request asks for a directory and the default file exists in it
+                //Sets the default resource file as the current resource file
+                this.resource_file = default_resource;
+                //Returns 100 Continue
+                return 100;
+            }else{
+                //The requested resource is a directory AND
+                //The default file for the directory does not exist
+                //The action depends on the ALLOW directive
+                //Retrieve ALLOW directive from properties file
+                String allow = WebServer.PROPERTIES.getProperty("ALLOW");
+                if (allow.equalsIgnoreCase("true")){
+                    //ALLOW directive enabled
+                    //Sets status code to 404 (because the file the client asked for does not exist)
+                    this.status_code = 404;
+                    //Generates an HTML document with the directory listing
+                    String[] dir_page = generateDirectoryPage(
+                            new File(WebServer.PROPERTIES.getProperty("DIRECTORY")));
+                    int dir_page_size = 0;
+                    for (String line : dir_page)
+                        dir_page_size += (line.length() + System.lineSeparator().length());
+                    //Sends the 404 Header
+                    output_writer.write(fileNotFound());
+                    output_writer.println("Content-type: text/html");
+                    output_writer.println("Content-size: " + dir_page_size);
+                    output_writer.println();
+                    //Sends the blank line
+                    output_writer.println();
+                    for (String line : dir_page)
+                        output_writer.println(line);
+                    return status_code;
+                }else{
+                    //ALLOW directive disabled
+                    //Can't access a directory, so returns accessForbidden
+                    output_writer.write(accessForbidden());
+                    output_writer.println();
+                    return status_code;
+                }
+            }
+        }
+        return 100;
+    }
+    
     /**
      * Dynamically generate an HTML Document that links every item in the specified directory,
      * and returns it in an array of Strings, line by line.
      * @param dir - a FILE object containing the directory to list
      * @return - The HTML page represented as an array of Strings, with each element being a line of the file
      */
-    public String[] generateDirectoryPage(File dir){
+    private String[] generateDirectoryPage(File dir){
         if(dir.isDirectory()){
             ArrayList<String> page = new ArrayList(50);
+            //The header of this generic document is 116 bytes long
             page.add("<!DOCTYPE html>");
             page.add("<html>");
             page.add("<head>");
             page.add("<title>Directory index</title>");
             page.add("</head>");
             page.add("");
+            page.add("<body>");
             page.add("<h1>Listing of the directory</h1>");
             page.add("<ul>");
             String[] dir_list = dir.list();
             for (String item : dir_list) {
-                page.add("<il href=\"" + "http://" + hostname + "/" + item + "\">" + item + "</il>");
+                page.add("<li><a href=\"" + "http://" + hostname + "/" + item + "\">" + item + "</a></li>");
             }
             page.add("</ul>");
+            page.add("</body>");
+            page.add("</html>");
             return page.toArray(new String[0]);
         }else{
             //The specified directory is not a directory
             return null;
         }
     }
+    
+    /**
+     * Checks if there is a If-Modified-Since line, and if there is one, checks if
+     * the file has been modified since the indicated date
+     * @return - the status code 100 if there is no If-Mod-Since line, or if the file
+     * was modified, 304 if the file was not modified
+     * @throws DateTimeParseException if the date is not correctly formatted
+     */
+    private int checkIfModified() throws DateTimeParseException{
+        /*Checks for the If-Modified-Since line.
+        if the field exists, checks whether the file was or not modified*/
+            for (int i = 1; i<request_lines.length; i++){
+                if (request_lines[i].startsWith("If-Modified-Since: ")){
+                    if (wasModified(resource_file, request_lines[i].substring(19)))
+                        return (this.status_code = 304);
+                    else
+                        return 100;
+                }
+            }
+            return 100;
+    }
+    
     /**
      * Writes information about the request and response in a log file. If the request
      * caused an error, writes it in the same file
@@ -199,6 +306,7 @@ public class HttpRequest {
     public void log(PrintWriter log_writer){
         log(log_writer,log_writer);
     }
+    
     /**
      * Writes information about the request and response in a log file. If the request
      * caused an error, writes it in the error logs file.
@@ -223,6 +331,11 @@ public class HttpRequest {
             error_writer.println();
         }
     }
+    
+    /**
+     * Gives the status of the object, based on the status_code
+     * @return a String with the name of the status code of this object
+     */
     public String statusCodeString(){
         StringBuilder sb = new StringBuilder("Status code: ");
         switch (this.status_code){
@@ -246,6 +359,7 @@ public class HttpRequest {
         }
         return sb.toString();
     }
+    
     /**
      * This method takes no arguments and returns the current system date and time
      * in Http v1 format
@@ -262,26 +376,25 @@ public class HttpRequest {
      * Includes the header and the Date line
      * @return a String containing the response
      */
-    public String badRequest(){
+    private String badRequest(){
         StringBuilder response = new StringBuilder();
         response.append("HTTP/1.0 400 Bad Request");
         response.append(System.lineSeparator());
         response.append(getHttpDate());
-        response.append(System.lineSeparator());
         this.status_code = 400;
         return response.toString();
     }
+    
     /**
      * This method generates a generic HTTP 403 Access Forbidden response
      * Includes header and Date line
      * @return a String containing the response
      */
-    public String accessForbidden() {
+    private String accessForbidden() {
         StringBuilder response = new StringBuilder();
         response.append("HTTP/1.0 403 Access Forbidden");
         response.append(System.lineSeparator());
         response.append(getHttpDate());
-        response.append(System.lineSeparator());
         this.status_code = 403;
         return response.toString();
     }
@@ -291,15 +404,15 @@ public class HttpRequest {
      * Includes header and Date line
      * @return a String containing the response
      */
-    public String fileNotFound(){
+    private String fileNotFound(){
         StringBuilder response = new StringBuilder();
         response.append("HTTP/1.0 404 Not Found");
         response.append(System.lineSeparator());
         response.append(getHttpDate());
-        response.append(System.lineSeparator());
         this.status_code = 404;
         return response.toString();
     }
+    
     /**
      * This method checks if a file has been modified since the date indicated
      * @param file: the file to check

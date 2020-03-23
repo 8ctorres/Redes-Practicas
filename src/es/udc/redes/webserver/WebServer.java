@@ -20,7 +20,7 @@ public class WebServer {
     /**
      * Indicates where the webserver properties file is located in the system
      */
-    public static final String PROPERTIES_PATH = "C:\\Users\\carlo\\FIC\\Redes\\src\\server.properties";
+    public static final String PROPERTIES_PATH = "C:\\Users\\carlo\\FIC\\Redes\\server.properties";
     public static final Properties PROPERTIES = WebServer.loadProperties();
     /**
      * This method loads the webserver properties from the file
@@ -46,7 +46,8 @@ public class WebServer {
      * @return a PrintWriter object that can be used to write to the log file
      */
     private static PrintWriter openLog() throws FileNotFoundException, IOException{
-        File log = new File(PROPERTIES.getProperty("LOG_FILE"));
+        String path = PROPERTIES.getProperty("LOG_FILE");
+        File log = new File(path);
         if (!log.isFile()){
             /*The FileNotFoundException exception should never occur because it is checked that
             the file exists BEFORE trying to open a PrintWriter to it*/
@@ -60,7 +61,8 @@ public class WebServer {
      * @return a PrintWriter object that can be used to write to the log file
      */
     private static PrintWriter openErrorLog() throws FileNotFoundException, IOException{
-        File error_log = new File(PROPERTIES.getProperty("ERROR_LOG_FILE"));
+        String path = PROPERTIES.getProperty("ERROR_LOG_FILE");
+        File error_log = new File(path);
         if(!error_log.isFile()){
             error_log.createNewFile();
         }
