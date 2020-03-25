@@ -14,6 +14,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +34,7 @@ public class HttpRequest {
     private final String client_ip;
     private int status_code = 100;
     private int bytes_sent = 0;
+    
     /**
      * Creates a new HTTPRequest object, from a given request,
      * and the IP of the Client that sent the request
@@ -60,7 +63,7 @@ public class HttpRequest {
         //Reads the host name from the request
         this.hostname = readHostname();
         
-        //Gets the requested resource name
+        //Gets the request resource name and parameters
         String resource_name = getResourceName();
         
         //If the resource name wasn't parsed, it means that the request is not correct
@@ -69,6 +72,13 @@ public class HttpRequest {
             output_writer.println();
             return status_code;
         }
+        
+        //Handling dynamic requests
+        status_code = handleDynRequest(resource_name);
+        
+        //If if wasn't a dynamic request, continue
+        if(status_code != 100)
+            return status_code;
         
         //Builds a file that points to the resource in the system
         //Opens the file now because the name has been correctly parsed (in method getResourceName)
@@ -84,7 +94,7 @@ public class HttpRequest {
         */
         status_code = handleDirectories();
         
-        //Exits now if the request has already been handled as a directory
+        //If it wasn't a directory, continue
         if (status_code != 100)
             return status_code;
         
@@ -173,16 +183,74 @@ public class HttpRequest {
             return null;
         }
         
-        //TODO
-        //Move this section to each specific class
         if ((!"GET".equals(petition_words[0])) && (!"HEAD".equals(petition_words[0]))){
             //If the method is not GET or HEAD, send 400 badRequest
             System.out.println("split_petition[0] = " + petition_words[0]);
             //Bad request
             return null;
         }
-        //If the client asked for the index (GET /), this returns the empty string
-        return petition_words[1].substring(1);
+        
+        return petition_words[1].split("\\?")[0].substring(1);
+    }
+    
+    /**
+     * Gets the request parameters, if any.
+     * @return a Map containing all the parameters in a Map as <Param_name, value>
+     */
+    private Map<String, String> getParameters(){
+        HashMap<String, String> mapa = new HashMap<>();
+        /*Takes the petition line (request_lines[0]), splits it in words (split (space))
+        then takes the first word, which contains the resource name and the parameters.
+        Splits that using the "?" and takes the second part (the parameters), and then
+        splits all of the parameters in a String of the form (param=value) (splits by "&")
+        */
+        try{
+            String[] params = this.request_lines[0].split(" ")[1].split("\\?")[1].split("&");
+            for (String param : params) {
+                String[] name_and_value = param.split("=");
+                mapa.put(name_and_value[0], name_and_value[1]);
+            }
+        }
+        catch(NullPointerException | ArrayIndexOutOfBoundsException ex){
+            /*If any of those array positions doesn't exist, that means that there
+            are no parameters, or they're incorrectly parsed*/
+            return null;
+        }
+        return mapa;        
+    }
+    
+    /**
+     * Checks if the request is a dynamic request. If it's not, returns "100 Continue"
+     * If it is, handles it accordingly and returns the corresponding status code (always different from 100)
+     * @param resource_name - the resource name from the request (used to determine if it is a dynamic 
+     * request or not)
+     * @return the status code
+     */
+    private int handleDynRequest(String resource_name){
+        if (resource_name.endsWith(".do")){
+            try {
+                Map<String, String> parameters = getParameters();
+                String dyn_res = "es.udc.redes.webserver." + resource_name.substring(0, resource_name.length() -3);            
+                String body = ServerUtils.processDynRequest(dyn_res, parameters);
+                //Writes head of the response
+                output_writer.println("HTTP/1.0 200 OK");
+                output_writer.write(date_time);
+                output_writer.println("Server: Redes/Carlos Torres");
+                output_writer.println("Content-Type: text/html");
+                output_writer.println("Content-Length: " + body.length()+ "\n".length());
+                //Blank line
+                output_writer.println();
+                output_writer.flush();
+                //Writes body
+                output_writer.write(body);
+                output_writer.println();
+                output_writer.flush();
+                return (status_code = 200);
+            } catch (Exception ex) {
+                Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return 100;
     }
     
     /**
@@ -429,6 +497,20 @@ public class HttpRequest {
         response.append(System.lineSeparator());
         response.append(getHttpDate());
         this.status_code = 404;
+        return response.toString();
+    }
+    
+    /**
+     * This method generates a generic HTTP 500 Internal Server Error response
+     * Includes header and Date line
+     * @return a String containing the response
+     */
+    private String serverError(){
+        StringBuilder response = new StringBuilder();
+        response.append("HTTP/1.0 500 Internal Server Error");
+        response.append(System.lineSeparator());
+        response.append(getHttpDate());
+        this.status_code = 500;
         return response.toString();
     }
     

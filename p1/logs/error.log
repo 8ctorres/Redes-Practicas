@@ -478,3 +478,78 @@ GET /fic.png HTTP/1.1
 Date: Wed, 25 Mar 2020 16:10:21 GMT
 Status code: 404 Not Found
 
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 17:00:59 GMT
+Status code: 404 Not Found
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 17:01:19 GMT
+Status code: 404 Not Found
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 17:01:20 GMT
+Status code: 404 Not Found
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 17:01:21 GMT
+Status code: 404 Not Found
+
+GET /MiServlet.do?nombre=nombre&primerApellido=ap1&segundoApellido=ap2 HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:00:57 GMT
+Status code: 404 Not Found
+
+GET /MiServlet.do?nombre=&primerApellido=&segundoApellido= HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:05:58 GMT
+Status code: 404 Not Found
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:27:18 GMT
+Status code: 400 Bad Request
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:27:24 GMT
+Status code: 400 Bad Request
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:27:25 GMT
+Status code: 400 Bad Request
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:27:25 GMT
+Status code: 400 Bad Request
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:27:30 GMT
+Status code: 400 Bad Request
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.0
+127.0.0.1
+Date: Wed, 25 Mar 2020 20:32:23 GMT
+Status code: 400 Bad Request
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:36:47 GMT
+Status code: 500
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:36:50 GMT
+Status code: 500
+
+    /**
+127.0.0.1
+Date: Wed, 25 Mar 2020 20:37:07 GMT
+Status code: 400 Bad Request
+

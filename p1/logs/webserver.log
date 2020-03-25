@@ -364,3 +364,51 @@ Date: Wed, 25 Mar 2020 16:56:49 GMT
 Status code: 304 Not Modified
 Bytes sent: 0
 
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 17:01:19 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 17:01:20 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 17:01:21 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:27:02 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:41:41 GMT
+Status code: 200 OK
+Bytes sent: 0
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:41:57 GMT
+Status code: 200 OK
+Bytes sent: 0
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:42:52 GMT
+Status code: 200 OK
+Bytes sent: 0
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 20:45:57 GMT
+Status code: 200 OK
+Bytes sent: 0
+
