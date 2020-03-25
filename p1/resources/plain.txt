@@ -1,0 +1,7 @@
+This is a plain text file
+
+It is only for testing purposes
+
+Written in Windows, with CR+LF line endings.
+
+File size = 133 bytes

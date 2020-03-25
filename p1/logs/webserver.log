@@ -1,0 +1,126 @@
+GET / HTTP/1.0
+127.0.0.1
+Date: Mon, 23 Mar 2020 15:37:29 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET /plain.txt HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 15:52:06 GMT
+Status code: 200 OK
+Bytes sent: 133
+
+GET /server.properties HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 15:52:09 GMT
+Status code: 200 OK
+Bytes sent: 248
+
+GET /plain.txt HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:12:12 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:03 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /index.html HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:06 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:06 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:07 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET /fic.png HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:08 GMT
+Status code: 200 OK
+Bytes sent: 13320
+
+GET /saludo.html HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:11 GMT
+Status code: 200 OK
+Bytes sent: 737
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:10 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:11 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET /server.properties HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:13 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:12 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:19 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:16:20 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET /images HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:26:30 GMT
+Status code: 200 OK
+Bytes sent: 0
+
+GET /plain.txt HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:27:42 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /images HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:27:53 GMT
+Status code: 200 OK
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:28:55 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET /images/ HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Mon, 23 Mar 2020 16:29:00 GMT
+Status code: 200 OK
+Bytes sent: 216
+
