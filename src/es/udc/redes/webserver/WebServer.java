@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,29 +20,30 @@ import java.util.logging.Logger;
  */
 public class WebServer {
     /**
-     * Indicates where the webserver properties file is located in the system
+     * Loads the webserver properties file
      */
-    public static final String PROPERTIES_PATH = "C:\\Users\\carlo\\FIC\\Redes\\server.properties";
-    public static final Properties PROPERTIES = WebServer.loadProperties();
+    public static Properties PROPERTIES;
+    
     /**
      * This method loads the webserver properties from the file
-     * @return 
+     * @param path the Path to the properties file
+     * @return the Properties object
      */
-    public static Properties loadProperties(){
+    public static Properties loadProperties(String path){
         Properties prop = new Properties();
         try {
-            prop.load(new FileInputStream(PROPERTIES_PATH));
+            prop.load(new FileInputStream(new File(path)));
         } catch (FileNotFoundException ex) {
-            System.out.println("Properties file does not exist");
-            Logger.getLogger(WebServer.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
+            System.err.println("ERROR: Properties file not found");
+            System.exit(-1);
         } catch (IOException ex) {
-            System.out.println("Properties file can't be opened");
-            Logger.getLogger(WebServer.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
+            System.err.println("ERROR: Properties file could not be opened");
+            System.exit(-1);
         }
+        System.out.println("Properties file loaded successfully from " + path);
         return prop;
     }
+    
     /**
      * Opens the log file
      * @return a PrintWriter object that can be used to write to the log file
@@ -56,6 +59,7 @@ public class WebServer {
         //Opens the file in append mode, and enables autoflush
         return new PrintWriter(new FileOutputStream(log, true), true);
     }
+    
     /**
      * Opens the error log file
      * @return a PrintWriter object that can be used to write to the log file
@@ -68,16 +72,19 @@ public class WebServer {
         }
         return new PrintWriter(new FileOutputStream(error_log, true), true);
     }
+    
     /**
      * Main method, the webserver runs this method when it is launched
      * It continuosly listens for new TCP connections and when a socket is
      * estabilished, launches a new thread and passes it as an argument.
-     * @param argv = arguments given in the command line
+     * @param argv = arguments given in the command line. None are needed
      */
     public static void main(String argv[]) {
-        if (argv.length != 0) {
-            System.err.println("No arguments required");
+        if (argv.length != 1) {
+            System.err.println("ERROR: Argument required (path to server.properties file)");
             System.exit(-1);
+        }else{
+            WebServer.PROPERTIES = WebServer.loadProperties(argv[0]);
         }
         try{
             ServerSocket servidor = new ServerSocket(Integer.parseInt(PROPERTIES.getProperty("PORT")));

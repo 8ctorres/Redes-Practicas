@@ -378,3 +378,103 @@ GET / HTTP/1.1
 Date: Mon, 23 Mar 2020 16:28:49 GMT
 Status code: 404 Not Found
 
+GET /images/ HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:52:59 GMT
+Status code: 404 Not Found
+
+GET /images/ HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:54:19 GMT
+Status code: 404 Not Found
+
+GET /images HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:54:21 GMT
+Status code: 404 Not Found
+
+GET /images HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:54:29 GMT
+Status code: 404 Not Found
+
+GET /images/ HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:56:58 GMT
+Status code: 404 Not Found
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:57:02 GMT
+Status code: 404 Not Found
+
+GET /fic.png HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:57:06 GMT
+Status code: 404 Not Found
+
+GET /fic.png HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:57:10 GMT
+Status code: 404 Not Found
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:57:19 GMT
+Status code: 404 Not Found
+
+GET /images/fudc.gif HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:01:27 GMT
+Status code: 404 Not Found
+
+GET /images/patata HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:06 GMT
+Status code: 404 Not Found
+
+GET /images/fudc.gif HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:10 GMT
+Status code: 404 Not Found
+
+GET /images/pepe.gi HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:14 GMT
+Status code: 404 Not Found
+
+GET /images/pepe.gif HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:15 GMT
+Status code: 404 Not Found
+
+GET /images/pepe.gi HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:20 GMT
+Status code: 404 Not Found
+
+GET /images/pepe.gif HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:22 GMT
+Status code: 404 Not Found
+
+GET /images/ HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:06:20 GMT
+Status code: 404 Not Found
+
+GET /images/ HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:08:16 GMT
+Status code: 404 Not Found
+
+GET /server.properties HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:09:18 GMT
+Status code: 404 Not Found
+
+GET /fic.png HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 16:10:21 GMT
+Status code: 404 Not Found
+

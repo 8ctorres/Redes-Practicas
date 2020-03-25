@@ -124,3 +124,243 @@ Date: Mon, 23 Mar 2020 16:29:00 GMT
 Status code: 200 OK
 Bytes sent: 216
 
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:52:32 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:52:45 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET /plain.txt HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:52:53 GMT
+Status code: 200 OK
+Bytes sent: 133
+
+GET /index.html HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:54:22 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:57:19 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:57:21 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:12 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:14 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:15 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:15 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:15 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:15 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:31 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:31 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:32 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:32 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:58:32 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 14:59:21 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:00:03 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:00:47 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:00:49 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /images/fic.png HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:01:22 GMT
+Status code: 200 OK
+Bytes sent: 13320
+
+GET /images/udc.gif HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:02 GMT
+Status code: 200 OK
+Bytes sent: 4250
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:28 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:56 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /favicon.ico HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:02:56 GMT
+Status code: 200 OK
+Bytes sent: 23558
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:05:24 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:05:26 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:05:33 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:05:36 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:06:07 GMT
+Status code: 200 OK
+Bytes sent: 216
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:08:20 GMT
+Status code: 200 OK
+Bytes sent: 332
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:08:20 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:08:26 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:08:47 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 15:08:49 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 16:10:16 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+HEAD / HTTP/1.0
+127.0.0.1
+Date: Wed, 25 Mar 2020 16:11:31 GMT
+Status code: 200 OK
+Bytes sent: 0
+
+HEAD /images/udc.gif HTTP/1.0
+127.0.0.1
+Date: Wed, 25 Mar 2020 16:11:43 GMT
+Status code: 200 OK
+Bytes sent: 0
+
+GET / HTTP/1.1
+0:0:0:0:0:0:0:1
+Date: Wed, 25 Mar 2020 16:56:49 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+

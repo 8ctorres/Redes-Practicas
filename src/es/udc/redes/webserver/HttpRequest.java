@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.nio.file.Files;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,8 +22,7 @@ import java.util.logging.Logger;
  * @author carlos.torres
  */
 public class HttpRequest {
-    private final String request;
-    private String[] request_lines;
+    private final String[] request_lines;
     private String hostname;
     private PrintWriter output_writer;
     private File resource_file;
@@ -41,10 +39,12 @@ public class HttpRequest {
      * @param client_ip - The InedAddress of the client
      */
     public HttpRequest(String req, InetAddress client_ip){
-        this.request = req;
+        //When constructing the object, the request is split in lines
+        this.request_lines = req.split(System.lineSeparator());
         this.client_ip = client_ip.getHostAddress();
         this.date_time = getHttpDate();
     }
+    
     /**
      * Interprets the HTTP request and sends the appropiate response
      * using the given output stream
@@ -56,9 +56,6 @@ public class HttpRequest {
         
         //Builds a PrintWriter object to send characters, with AutoFlush enabled
         this.output_writer = new PrintWriter(output, true);
-        
-        //Split request in lines
-        this.request_lines = this.request.split(System.lineSeparator());
         
         //Reads the host name from the request
         this.hostname = readHostname();
@@ -74,21 +71,37 @@ public class HttpRequest {
         }
         
         //Builds a file that points to the resource in the system
+        //Opens the file now because the name has been correctly parsed (in method getResourceName)
         this.resource_file = openFile(resource_name);
         
+        /*Handles the requests that ask for a directory
+        If the resource is not a directory, handleDirectories() returns "100 Continue"
+        status code and the execution continues as normal. If it is a directory, it will
+        check if the default file for that directory exists. In that case it will assign that
+        to the object's resource_file field and return "100 Continue". In case it does not
+        exist, it'll read the ALLOW directive from the properties file and act accordingly, returning
+        either a 404 and a 403, in either case, execution will stop right when this method returns
+        */
         status_code = handleDirectories();
         
+        //Exits now if the request has already been handled as a directory
         if (status_code != 100)
-            return status_code; 
+            return status_code;
         
+        /*If the request asked for a file and not a directory
+        it is still necessary to check if that file exists*/
         if (!resource_file.exists()){
             //Checks that the file exists
-            //If the requested resource does not exist, respond 404 Not Found
+            //If the requested resource does not exist, respond 404 Not Found and exit
             output_writer.write(fileNotFound());
             output_writer.println();
             return status_code;
         }
         
+        /*Checks if the client send an If-Modified-Since line.
+        If there is no such line, or if the line exists but the file has been
+        modified since that date, the method returns "100 Continue" status code
+        If the file was not modified, the method returns a "304 Not Modified" status code*/
         try{
             status_code = checkIfModified();
         }
@@ -100,25 +113,26 @@ public class HttpRequest {
             return status_code;
         }
         
+        //Creates an Http Resource from the file, to read header and body from it        
         HttpResource resource = new HttpResource(resource_file);
         
-        resource.writeHead(output_writer, (status_code != 304)); //Status and header lines
-        //Output PrintWriter is flushed now to prevent problems when sending the file body
-        output_writer.flush();
+        //Status and header lines
+        status_code = resource.writeHead(output_writer, (status_code != 304));
+        
         //Writes blank line
         output_writer.println();
+        //Output PrintWriter is flushed now to prevent problems when sending the file body
+        output_writer.flush();
         
-        //TODO implementar método sendBody() ou equivalente, tendo en conta o tipo de petición
-        //e si o ficheiro foi modificado
-        
-        //Head requests don't send body. If it was not modified, the body isn't sent either
-        if ((split_petition[0].equals("GET")) && (was_mod)){
+        //Only if it is a GET request AND the file was modified, then sends body
+        if (("GET".equals(this.request_lines[0].split(" ")[0])) && (status_code == 200)){
             try {
                 bytes_sent = resource.writeBody(output, output_writer); //File body
             } catch (FileNotFoundException ex) {
                 //Should never happen because its already been checked that the file exists
                 System.out.println("File not found exception");
                 Logger.getLogger(HttpRequest.class.getName()).log(Level.SEVERE, null, ex);
+                return 500;
             }
         }
         return status_code;
@@ -132,7 +146,7 @@ public class HttpRequest {
         //Reads hostname, used for redirection links
         for (int i = 1; i<request_lines.length; i++){
                 if (request_lines[i].startsWith("Host: ")){
-                    return request_lines[i].substring(6, request_lines[i].length()-1);
+                    return request_lines[i].substring(6);
                 }
         }
         return null;
@@ -217,11 +231,12 @@ public class HttpRequest {
                     //Sets status code to 404 (because the file the client asked for does not exist)
                     this.status_code = 404;
                     //Generates an HTML document with the directory listing
-                    String[] dir_page = generateDirectoryPage(
-                            new File(WebServer.PROPERTIES.getProperty("DIRECTORY")));
+                    String[] dir_page = generateDirectoryPage(resource_file);
                     int dir_page_size = 0;
                     for (String line : dir_page)
                         dir_page_size += (line.length() + System.lineSeparator().length());
+                    //Stores bytes send in the object
+                    this.bytes_sent = dir_page_size;
                     //Sends the 404 Header
                     output_writer.write(fileNotFound());
                     output_writer.println("Content-type: text/html");
@@ -229,6 +244,7 @@ public class HttpRequest {
                     output_writer.println();
                     //Sends the blank line
                     output_writer.println();
+                    //Sends the page
                     for (String line : dir_page)
                         output_writer.println(line);
                     return status_code;
@@ -257,11 +273,13 @@ public class HttpRequest {
             page.add("<!DOCTYPE html>");
             page.add("<html>");
             page.add("<head>");
+            page.add("<meta charset=\"utf-8\" />");
+            page.add("<meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />");
             page.add("<title>Directory index</title>");
             page.add("</head>");
             page.add("");
             page.add("<body>");
-            page.add("<h1>Listing of the directory</h1>");
+            page.add("<h1>Listing of the directory " + dir.getName() + "</h1>");
             page.add("<ul>");
             String[] dir_list = dir.list();
             for (String item : dir_list) {
@@ -290,9 +308,9 @@ public class HttpRequest {
             for (int i = 1; i<request_lines.length; i++){
                 if (request_lines[i].startsWith("If-Modified-Since: ")){
                     if (wasModified(resource_file, request_lines[i].substring(19)))
-                        return (this.status_code = 304);
-                    else
                         return 100;
+                    else
+                        return (this.status_code = 304);
                 }
             }
             return 100;
@@ -314,9 +332,10 @@ public class HttpRequest {
      * @param error_writer - a PrintWriter object to write to the error logs file
      */
     public void log(PrintWriter log_writer, PrintWriter error_writer){
+        String petition_line = this.request_lines[0];
         if (this.status_code < 400){
             //NO ERRORS
-            log_writer.println(this.petition_line);
+            log_writer.println(petition_line);
             log_writer.println(this.client_ip);
             log_writer.print(this.date_time);
             log_writer.println(statusCodeString());
@@ -324,7 +343,7 @@ public class HttpRequest {
             log_writer.println();
         }else{
             //ERROR LOG
-            error_writer.println(this.petition_line);
+            error_writer.println(petition_line);
             error_writer.println(this.client_ip);
             error_writer.print(this.date_time);
             error_writer.println(statusCodeString());
