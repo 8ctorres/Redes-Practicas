@@ -1,13 +1,26 @@
 package es.udc.redes.webserver;
 import java.util.Map;
 
+/**
+ * This class represents a servlet that generates a page that greets the user
+ * @author Carlos Torres (carlos.torres@udc.es)
+ */
 public class MiServlet implements MiniServlet {
 	
-	/* Para el correcto funcionamiento es necesario un constructor 
-	 * sin parámetros y público */
-	public MiServlet(){}
-        
+
+        /**
+         * Constructs this servlet, takes no parameters
+         */
+	public MiServlet(){
+		
+	}
+	
         @Override
+        /**
+        * Generates the page based on the parameters
+        * @param parameters a Map(String, String) containing the parameters
+        * @return a multi line String that represents the page
+        */
 	public String doGet (Map<String, String> parameters){
 		String nombre = parameters.get("nombre");
 		String primerApellido = parameters.get("primerApellido");
@@ -22,7 +35,7 @@ public class MiServlet implements MiniServlet {
 	}
 
 	private String printBody(String nombreCompleto) {
-		return "<body> <h1> Hola, " + nombreCompleto + "</h1></body>";
+		return "<body><h1> Hola " + nombreCompleto + "</h1></body>";
 	}
 
 	private String printEnd() {

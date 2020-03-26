@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.udc.redes.webserver;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,8 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An Http request object represents an HTTP v1.0 Request, given as a multi-line String
- * @author carlos.torres
+ * This class represents an HTTP v1.0 Request
+ * @author Carlos Torres (carlos.torres@udc.es)
  */
 public class HttpRequest {
     private final String[] request_lines;
@@ -38,8 +33,8 @@ public class HttpRequest {
     /**
      * Creates a new HTTPRequest object, from a given request,
      * and the IP of the Client that sent the request
-     * @param req - The request, in form of a multi-line string
-     * @param client_ip - The InedAddress of the client
+     * @param req The request, in form of a multi-line string
+     * @param client_ip The InedAddress of the client
      */
     public HttpRequest(String req, InetAddress client_ip){
         //When constructing the object, the request is split in lines
@@ -52,7 +47,7 @@ public class HttpRequest {
      * Interprets the HTTP request and sends the appropiate response
      * using the given output stream
      * This method does not close the output stream after using it
-     * @param output : the outputstream it uses to send the response
+     * @param output the outputstream it uses to send the response
      * @return status code of the response
      */
     public int respond(OutputStream output){
@@ -166,7 +161,7 @@ public class HttpRequest {
      * Gets the requested resource name from the request. This method also
      * validates if the petition line is a valid HTTP 1.0 Request. If there is an error,
      * uses the object's output_writer to send an adequate error response.
-     * @return - a String containing the resource name, or null if there is an error
+     * @return a String containing the resource name, or null if there is an error
      * in the request (in which case, the object's status_code will be changed)
      */
     private String getResourceName(){
@@ -185,8 +180,6 @@ public class HttpRequest {
         
         if ((!"GET".equals(petition_words[0])) && (!"HEAD".equals(petition_words[0]))){
             //If the method is not GET or HEAD, send 400 badRequest
-            System.out.println("split_petition[0] = " + petition_words[0]);
-            //Bad request
             return null;
         }
         
@@ -222,7 +215,7 @@ public class HttpRequest {
     /**
      * Checks if the request is a dynamic request. If it's not, returns "100 Continue"
      * If it is, handles it accordingly and returns the corresponding status code (always different from 100)
-     * @param resource_name - the resource name from the request (used to determine if it is a dynamic 
+     * @param resource_name the resource name from the request (used to determine if it is a dynamic 
      * request or not)
      * @return the status code
      */
@@ -255,7 +248,7 @@ public class HttpRequest {
     
     /**
      * Opens the file in the system that corresponds to the request resource
-     * @param resource_name - a String containing the resource name
+     * @param resource_name a String containing the resource name
      * @return a File pointer
      */
     private File openFile(String resource_name){
@@ -331,11 +324,12 @@ public class HttpRequest {
     /**
      * Dynamically generate an HTML Document that links every item in the specified directory,
      * and returns it in an array of Strings, line by line.
-     * @param dir - a FILE object containing the directory to list
-     * @return - The HTML page represented as an array of Strings, with each element being a line of the file
+     * @param dir a FILE object containing the directory to list
+     * @return The HTML page represented as an array of Strings, with each element being a line of the file
      */
     private String[] generateDirectoryPage(File dir){
         if(dir.isDirectory()){
+            String dirname = this.request_lines[0].split(" ")[1].substring(1);
             ArrayList<String> page = new ArrayList(50);
             //The header of this generic document is 116 bytes long
             page.add("<!DOCTYPE html>");
@@ -351,7 +345,7 @@ public class HttpRequest {
             page.add("<ul>");
             String[] dir_list = dir.list();
             for (String item : dir_list) {
-                page.add("<li><a href=\"" + "http://" + hostname + "/" + item + "\">" + item + "</a></li>");
+                page.add("<li><a href=\"" + "http://" + hostname + "/" + dirname + "/" + item + "\">" + item + "</a></li>");
             }
             page.add("</ul>");
             page.add("</body>");
@@ -366,7 +360,7 @@ public class HttpRequest {
     /**
      * Checks if there is a If-Modified-Since line, and if there is one, checks if
      * the file has been modified since the indicated date
-     * @return - the status code 100 if there is no If-Mod-Since line, or if the file
+     * @return the status code 100 if there is no If-Mod-Since line, or if the file
      * was modified, 304 if the file was not modified
      * @throws DateTimeParseException if the date is not correctly formatted
      */
@@ -387,7 +381,7 @@ public class HttpRequest {
     /**
      * Writes information about the request and response in a log file. If the request
      * caused an error, writes it in the same file
-     * @param log_writer - a PrintWriter object to write to the log file
+     * @param log_writer a PrintWriter object to write to the log file
      */
     public void log(PrintWriter log_writer){
         log(log_writer,log_writer);
@@ -396,8 +390,8 @@ public class HttpRequest {
     /**
      * Writes information about the request and response in a log file. If the request
      * caused an error, writes it in the error logs file.
-     * @param log_writer - a PrintWriter object to write to the log file
-     * @param error_writer - a PrintWriter object to write to the error logs file
+     * @param log_writer a PrintWriter object to write to the log file
+     * @param error_writer a PrintWriter object to write to the error logs file
      */
     public void log(PrintWriter log_writer, PrintWriter error_writer){
         String petition_line = this.request_lines[0];
@@ -516,8 +510,8 @@ public class HttpRequest {
     
     /**
      * This method checks if a file has been modified since the date indicated
-     * @param file: the file to check
-     * @param since: the date formatted in a String
+     * @param file the file to check
+     * @param since the date formatted in a String
      * @return true if it was modified
      */
     public boolean wasModified(File file, String since) throws DateTimeParseException {

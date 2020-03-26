@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package es.udc.redes.webserver;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,8 +9,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An HTTP Thread, given an existing, open socket, listens for an HTTP Request,
- * handles it and then sends back the adequate response into that socket
+ * Represents a Thread that will be used to handle an HTTP request
+ * This class provides the run() method, that given an existing, open socket,
+ * reads an incoming HTTP Request, handles it and then sends back the
+ * adequate response into that socket. It also logs all the requests to a file.
  * @author Carlos Torres (carlos.torres@udc.es)
  */
 public class HttpThread extends Thread{
@@ -26,15 +23,19 @@ public class HttpThread extends Thread{
     private OutputStream output;
     /**
      * Builds an HttpThread from an open Socket, and specifies streams to write logs and error logs
-     * @param socket - The TCP Socket through which the HTTP Requests will come in
-     * @param log_writer - A PrintWriter object that can be used to write logs
-     * @param error_writer - A PrintWriter object that can be used to write error logs
+     * @param socket The TCP Socket through which the HTTP Requests will come in
+     * @param log_writer A PrintWriter object that can be used to write logs
+     * @param error_writer A PrintWriter object that can be used to write error logs
      */
     public HttpThread(Socket socket, PrintWriter log_writer, PrintWriter error_writer){
         this.socket = socket;
         this.log_writer = log_writer;
         this.error_writer = error_writer;
     }
+    /**
+     * Reads the request from the socket, processes it and sends the response back into that socket.
+     * It also adds the request to the log files.
+     */
     @Override
     public void run(){
         try {

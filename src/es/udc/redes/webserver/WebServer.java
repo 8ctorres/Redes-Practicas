@@ -7,8 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +23,7 @@ public class WebServer {
     public static Properties PROPERTIES;
     
     /**
-     * This method loads the webserver properties from the file
+     * Loads the webserver properties from the file
      * @param path the Path to the properties file
      * @return the Properties object
      */
@@ -77,7 +75,7 @@ public class WebServer {
      * Main method, the webserver runs this method when it is launched
      * It continuosly listens for new TCP connections and when a socket is
      * estabilished, launches a new thread and passes it as an argument.
-     * @param argv = arguments given in the command line. None are needed
+     * @param argv arguments given in the command line. None are needed
      */
     public static void main(String argv[]) {
         if (argv.length != 1) {
