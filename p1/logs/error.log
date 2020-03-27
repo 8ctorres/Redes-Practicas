@@ -13,3 +13,8 @@ GET /docs/ HTTP/1.1
 Date : 27/03/2020 16:53:27 Z
 Status code: 404 Not Found
 
+hola
+127.0.0.1
+Date : 27/03/2020 17:03:25 GMT
+Status code: 400 Bad Request
+

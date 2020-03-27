@@ -63,6 +63,8 @@ public class WebServer {
      */
     private static PrintWriter openErrorLog() throws FileNotFoundException, IOException{
         String path = PROPERTIES.getProperty("ERROR_LOG_FILE");
+        if ((path == null) || (path.equals("")))
+            return openLog();
         File error_log = new File(path);
         if(!error_log.isFile()){
             error_log.createNewFile();
@@ -85,8 +87,10 @@ public class WebServer {
         }
         try{
             ServerSocket servidor = new ServerSocket(Integer.parseInt(PROPERTIES.getProperty("PORT")));
+            PrintWriter log = openLog();
+            PrintWriter err_log = openErrorLog();
             while (true){
-                (new HttpThread(servidor.accept(), openLog(), openErrorLog())).start();
+                (new HttpThread(servidor.accept(), log, err_log)).start();
             }
         } catch (IOException ex) {
             Logger.getLogger(WebServer.class.getName()).log(Level.SEVERE, null, ex);
