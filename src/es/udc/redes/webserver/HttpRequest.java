@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +26,7 @@ public class HttpRequest {
     private File resource_file;
     /*Stores some of the response details,
     so they can be accessed later by log() and errorLog() methods*/
-    private final String date_time;
+    private final String log_date_time;
     private final String client_ip;
     private int status_code = 100;
     private int bytes_sent = 0;
@@ -40,7 +41,7 @@ public class HttpRequest {
         //When constructing the object, the request is split in lines
         this.request_lines = req.split(System.lineSeparator());
         this.client_ip = client_ip.getHostAddress();
-        this.date_time = getHttpDate();
+        this.log_date_time = getLogDate();
     }
     
     /**
@@ -227,7 +228,7 @@ public class HttpRequest {
                 String body = ServerUtils.processDynRequest(dyn_res, parameters);
                 //Writes head of the response
                 output_writer.println("HTTP/1.0 200 OK");
-                output_writer.write(date_time);
+                output_writer.write(getHttpDate());
                 output_writer.println("Server: Redes/Carlos Torres");
                 output_writer.println("Content-Type: text/html");
                 output_writer.println("Content-Length: " + body.length()+ "\n".length());
@@ -399,7 +400,7 @@ public class HttpRequest {
             //NO ERRORS
             log_writer.println(petition_line);
             log_writer.println(this.client_ip);
-            log_writer.print(this.date_time);
+            log_writer.print(this.log_date_time);
             log_writer.println(statusCodeString());
             log_writer.println("Bytes sent: " + this.bytes_sent);
             log_writer.println();
@@ -407,7 +408,7 @@ public class HttpRequest {
             //ERROR LOG
             error_writer.println(petition_line);
             error_writer.println(this.client_ip);
-            error_writer.print(this.date_time);
+            error_writer.print(this.log_date_time);
             error_writer.println(statusCodeString());
             error_writer.println();
         }
@@ -450,6 +451,14 @@ public class HttpRequest {
         return "Date: " + 
                 ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.RFC_1123_DATE_TIME) + 
                 System.lineSeparator();
+    }
+    
+    private static String getLogDate(){
+        return "Date : " +
+                ZonedDateTime.now(ZoneOffset.UTC).format(
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH))
+                + " GMT"
+                + System.lineSeparator();
     }
     
     /**
@@ -499,12 +508,11 @@ public class HttpRequest {
      * Includes header and Date line
      * @return a String containing the response
      */
-    private String serverError(){
+    public static String serverError(){
         StringBuilder response = new StringBuilder();
         response.append("HTTP/1.0 500 Internal Server Error");
         response.append(System.lineSeparator());
         response.append(getHttpDate());
-        this.status_code = 500;
         return response.toString();
     }
     

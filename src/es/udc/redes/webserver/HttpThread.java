@@ -67,6 +67,34 @@ public class HttpThread extends Thread{
             output.close();
         } catch (IOException ex) {
             Logger.getLogger(HttpThread.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (OutOfMemoryError err) {
+            /*
+            During testing, sometimes the rq_builder.append(line) call in line 55, inside
+            the do-while loop would throw an "OutOfMemoryError: Java heap space" error.
+            I could not find a way to replicate the error, as it is apparently random, and
+            it was impossible for me to solve it. If and when that happens, that error is
+            caught here and the server returns a "500 Internal Server Error" HTTP Status Code
+            
+            Here I add a snapshot of the Error, just so it is documented if anybody would want
+            to try and solve it:
+            *
+            Exception in thread "Thread-7" java.lang.OutOfMemoryError: Java heap space
+                at java.util.Arrays.copyOf(Arrays.java:3332)
+                at java.lang.AbstractStringBuilder.ensureCapacityInternal(AbstractStringBuilder.java:124)
+                at java.lang.AbstractStringBuilder.append(AbstractStringBuilder.java:448)
+                at java.lang.StringBuilder.append(StringBuilder.java:136)
+                at es.udc.redes.webserver.HttpThread.run(HttpThread.java:55)
+            *
+            */
+            try (PrintWriter output_writer = new PrintWriter(this.output, true)) {
+                output_writer.write(HttpRequest.serverError());
+            }
+            try{
+                input.close();
+                output.close();
+            }catch(IOException ex){
+                Logger.getLogger(HttpThread.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         finally{
             try {

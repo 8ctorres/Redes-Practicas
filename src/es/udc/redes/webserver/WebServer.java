@@ -38,7 +38,6 @@ public class WebServer {
             System.err.println("ERROR: Properties file could not be opened");
             System.exit(-1);
         }
-        System.out.println("Properties file loaded successfully from " + path);
         return prop;
     }
     

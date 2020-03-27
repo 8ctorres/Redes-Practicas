@@ -1,0 +1,78 @@
+GET /demo.html HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:16:16 Z
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /MiServlet.do?nombre=Carlos&primerApellido=Torres&segundoApellido=Paz HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:16:35 Z
+Status code: 200 OK
+Bytes sent: 0
+
+GET /calculadora.html HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:16:41 Z
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /Calculate.do?op1=1234&op2=1234&op=Multiplicar HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:16:45 Z
+Status code: 200 OK
+Bytes sent: 0
+
+GET /docs//texts/doc3.txt HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:16:51 Z
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /docs//texts/doc1.txt HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:16:55 Z
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /docs//enunciado.pdf HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:16:58 Z
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /docs/enunciado.pdf HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:17:03 Z
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /docs///enunciado.pdf HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:17:09 Z
+Status code: 200 OK
+Bytes sent: 209927
+
+GET /docs/enunciado.pdf HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:17:43 Z
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /fic.png HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:56:54 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /fic.png HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:57:02 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
+GET /docs/perro.jpg HTTP/1.1
+0:0:0:0:0:0:0:1
+Date : 27/03/2020 16:57:17 GMT
+Status code: 304 Not Modified
+Bytes sent: 0
+
